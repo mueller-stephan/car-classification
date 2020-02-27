@@ -7,12 +7,13 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.applications import ResNet50V2, VGG16
 from tensorflow.keras import Model, Input
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Flatten, Dropout, Conv2D
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
 class TransferModel:
 
-    def __init__(self, base: str, shape: tuple, classes: list, freeze: list = None, dropout: float = 0):
+    def __init__(self, base: str, shape: tuple, classes: list, freeze: list = None, dropout: float = 0,
+                 checkpoint_dir: str = "./checkpoints"):
         """
         Class for transfer learning from either VGG16 or ResNet
 
@@ -23,6 +24,7 @@ class TransferModel:
         """
         self.shape = shape
         self.classes = classes
+        self.checkpoint_dir = checkpoint_dir
         self.history = None
         self.base = None
         self.model = None
@@ -122,7 +124,11 @@ class TransferModel:
                                        patience=10,
                                        restore_best_weights=True)
 
-        callbacks = [early_stopping]
+        checkpoint_path = self.checkpoint_dir + '/cp.pkt'
+
+        checkpoint = ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True)
+
+        callbacks = [early_stopping, checkpoint]
 
         # Fitting
         self.history = self.model.fit(ds_train,
