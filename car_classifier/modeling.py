@@ -12,7 +12,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 class TransferModel:
 
-    def __init__(self, base: str, shape: tuple, classes: list, freeze: list = None):
+    def __init__(self, base: str, shape: tuple, classes: list, freeze: list = None, dropout: tuple = (0, 0)):
         """
         Class for transfer learning from either VGG16 or ResNet
 
@@ -58,9 +58,9 @@ class TransferModel:
             add_to_base = self.base_model.output
             add_to_base = Flatten(name='head_flatten')(add_to_base)
             add_to_base = Dense(1024, activation='relu', name='head_fc_1')(add_to_base)
-            add_to_base = Dropout(0.5, name='head_drop_1')(add_to_base)
+            add_to_base = Dropout(dropout[0], name='head_drop_1')(add_to_base)
             add_to_base = Dense(1024, activation='relu', name='head_fc_2')(add_to_base)
-            add_to_base = Dropout(0.5, name='head_drop_2')(add_to_base)
+            add_to_base = Dropout(dropout[1], name='head_drop_2')(add_to_base)
 
         # Add final output layer
         new_output = Dense(len(self.classes), activation='softmax', name='head_pred')(add_to_base)
