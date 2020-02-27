@@ -12,7 +12,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 class TransferModel:
 
-    def __init__(self, base: str, shape: tuple, classes: list, unfreeze: list = None):
+    def __init__(self, base: str, shape: tuple, classes: list, freeze: list = None):
         """
         Class for transfer learning from either VGG16 or ResNet
 
@@ -36,8 +36,8 @@ class TransferModel:
                                          weights='imagenet')
 
             self.base_model.trainable = False
-            if unfreeze is not None:
-                self.base_model = self._make_trainable(model=self.base_model, patterns=unfreeze)
+            if freeze is not None:
+                self.base_model = self._make_trainable(model=self.base_model, patterns=freeze)
 
             add_to_base = self.base_model.output
             add_to_base = GlobalAveragePooling2D(data_format='channels_last', name='head_gap')(add_to_base)
@@ -48,16 +48,19 @@ class TransferModel:
                                     input_shape=self.shape,
                                     weights='imagenet')
 
-            self.base_model.trainable = False
-            if unfreeze is not None:
-                self.base_model = self._make_trainable(model=self.base_model, patterns=unfreeze)
+            # Set entire model to be trainable
+            # > 23e6 trainable parameters
+            self.base_model.trainable = True
+
+            if freeze is not None:
+                self.base_model = self._freeze(model=self.base_model, patterns=freeze)
 
             add_to_base = self.base_model.output
             add_to_base = Flatten(name='head_flatten')(add_to_base)
             add_to_base = Dense(1024, activation='relu', name='head_fc_1')(add_to_base)
-            add_to_base = Dropout(0.3, name='head_drop_1')(add_to_base)
+            add_to_base = Dropout(0.5, name='head_drop_1')(add_to_base)
             add_to_base = Dense(1024, activation='relu', name='head_fc_2')(add_to_base)
-            add_to_base = Dropout(0.3, name='head_drop_2')(add_to_base)
+            add_to_base = Dropout(0.5, name='head_drop_2')(add_to_base)
 
         # Add final output layer
         new_output = Dense(len(self.classes), activation='softmax', name='head_pred')(add_to_base)
@@ -68,7 +71,7 @@ class TransferModel:
         self.freeze = pd.DataFrame(layers, columns=['Layer Type', 'Layer Name', 'Layer Trainable'])
 
     @staticmethod
-    def _make_trainable(model, patterns: list):
+    def _freeze(model, patterns: list):
         """
         Helper function to make certain layers trainable
 
@@ -83,7 +86,7 @@ class TransferModel:
             for pattern in patterns:
                 regex = re.compile(pattern)
                 if regex.search(layer.name):
-                    layer.trainable = True
+                    layer.trainable = False
                 else:
                     pass
 
