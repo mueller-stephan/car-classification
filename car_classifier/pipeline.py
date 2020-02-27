@@ -97,7 +97,9 @@ def image_augment(image, label):
         Tuple of image, label
     """
 
+    # Flip image with probability .5
     image = tf.image.random_flip_left_right(image)
+
     image = tf.image.random_brightness(image, max_delta=0.1 / 255.0)
     # image = tf.image.random_saturation(image, lower=0, upper=0.5)
     # image = tf.image.random_contrast(image, lower=0, upper=1.2)
@@ -125,7 +127,7 @@ def construct_ds(input_files,
         input_size: size of images (output size)
         prefetch_size: buffer size (number of batches to prefetch)
         shuffle_size: shuffle size (size of buffer to shuffle from)
-        augment: boolen if image augmentation is needed
+        augment: boolean if image augmentation is needed
 
     Returns:
         buffered and prefetched tf.data object with (image, label) tuple

@@ -114,6 +114,52 @@ def show_batch(ds, classes, rescale=True, size=(10, 10), title=None):
     plt.show()
 
 
+def show_batch_top_n(model, ds, classes, rescale=True, size=(10, 10), title=None, n=1):
+    """
+    Function to show a batch of images including labels from tf.data object
+
+    Args:
+        model: Model used for predictions
+        ds: a (batched) tf.data.Dataset
+        classes: a list of all classes (in order of one-hot-encoding)
+        rescale: boolen whether to multiple image values by 255
+        size: tuple giving plot size
+        title: plot title
+        n: number of predicted values to plot per image
+
+    Returns:
+        matplotlib.pyplot
+    """
+
+    plt.figure(figsize=size)
+
+    ds_1 = ds.take(1)
+
+    pred = model.top_n(ds_1, n=n)
+
+    for i, (image, label) in enumerate(ds_1):
+        image_array = image.numpy()
+        label_array = label.numpy()
+        batch_size = image_array.shape[0]
+        for idx in range(batch_size):
+            label = classes[np.argmax(label_array[idx])]
+            ax = plt.subplot(np.ceil(batch_size / 4), 4, idx + 1)
+            if rescale:
+                plt.imshow(image_array[idx] * 255)
+            else:
+                plt.imshow(image_array[idx])
+            plt.title(label + ' ' + str(image_array[idx].shape), fontsize=10)
+            top = list(pred[i].keys())[0]
+            plt.text(0, -1, "prediction: {0}, prob: {1}".format(classes[top], pred[i][top]))
+            plt.axis('off')
+
+    if title is not None:
+        plt.suptitle(title)
+
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.show()
+
+
 class GoogleCloudStorage:
     """
     Class for up/down-loading files to Google Cloud Storage

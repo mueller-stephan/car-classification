@@ -171,6 +171,27 @@ class TransferModel:
         else:
             return [np.argmax(x) for x in p]
 
+    def top_n(self, ds_new: tf.data.Dataset, n=5):
+        """
+        Return probabilities of top n classes of prediction
+        Args:
+            ds_new: tf.data.Dataset to be predicted
+            n: number of predictions to return
+
+        Returns:
+            list of dicts of length n with items {class label: probability}
+        """
+
+        p = self.model.predict(ds_new)
+
+        assert(n <= len(p))
+
+        class_probs = [dict(enumerate(x)) for x in p]
+
+        class_probs = [{k: v for k, v in sorted(x.items(), key=lambda item: item[1])[-n:]} for x in class_probs]
+
+        return class_probs
+
     def plot(self, what: str = 'metric'):
         """
         Method for training/validation visualization
