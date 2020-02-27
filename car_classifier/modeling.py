@@ -124,7 +124,7 @@ class TransferModel:
                                        patience=10,
                                        restore_best_weights=True)
 
-        checkpoint_path = self.checkpoint_dir + '/cp.pkt'
+        checkpoint_path = self.checkpoint_dir + '/cp.ckpt'
 
         checkpoint = ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True)
 
