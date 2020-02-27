@@ -149,7 +149,7 @@ def show_batch_top_n(model, ds, classes, rescale=True, size=(10, 10), title=None
             else:
                 plt.imshow(image_array[idx])
             plt.title(label + ' ' + str(image_array[idx].shape), fontsize=10)
-            top = list(pred[i].keys())[0]
+            top = pred[i][0]
             plt.text(0, -1, "prediction: {0}, prob: {1}".format(classes[top], pred[i][top]))
             plt.axis('off')
 
