@@ -101,7 +101,7 @@ def image_augment(image, label):
     image = tf.image.random_flip_left_right(image)
 
     image = tf.image.random_brightness(image, max_delta=0.1 / 255.0)
-    # image = tf.image.random_saturation(image, lower=0, upper=0.5)
+    image = tf.image.random_saturation(image, lower=0, upper=0.5)
     # image = tf.image.random_contrast(image, lower=0, upper=1.2)
 
     # Make sure the image is still in [0, 1]
@@ -143,6 +143,7 @@ def construct_ds(input_files,
 
     # Image augmentation
     if augment:
+        print("Doing augmentation...")
         ds = ds.map(image_augment)
 
     # Batch and prefetch data

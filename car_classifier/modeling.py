@@ -186,7 +186,7 @@ class TransferModel:
 
         assert(n <= len(p))
 
-        class_probs = sorted([list(enumerate(x)) for x in p], lambda x: x[1])[-n:]
+        class_probs = [sorted(list(enumerate(x)), key=lambda x: x[1])[-n:] for x in p]
 
         return class_probs
 
