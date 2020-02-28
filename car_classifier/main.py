@@ -5,7 +5,7 @@ import pandas as pd
 
 from car_classifier.pipeline import construct_ds
 from car_classifier.modeling import TransferModel
-from car_classifier.utils import show_batch, show_batch_top_n
+from car_classifier.utils import show_batch, show_batch_top_n, show_batch_with_pred
 
 from sklearn.model_selection import train_test_split
 
@@ -13,7 +13,7 @@ from tensorflow.keras.optimizers import Adam
 
 # Gobal settings
 INPUT_DATA_DIR = '../data/raw/'
-INPUT_SHAPE = (212, 320, 3)
+INPUT_SHAPE = (224, 224, 3)
 BATCH_SIZE = 32
 TARGET = 'make'
 BASE = 'ResNet'
@@ -50,24 +50,34 @@ plot_size = (18, 18)
 # show_batch(ds_valid, classes, size=plot_size, title='Validation data')
 # show_batch(ds_test, classes, size=plot_size, title='Testing data')
 
-# Init base model and compile
-model = TransferModel(base=BASE,
-                      shape=INPUT_SHAPE,
-                      classes=classes)
+# Read in model, predict and plot
+
+model = TransferModel(base=BASE, shape=INPUT_SHAPE, classes=classes, dropout=0.2)
 
 model.compile(loss="categorical_crossentropy",
               optimizer=Adam(0.0001),
               metrics=["categorical_accuracy"])
 
-# Load weights
-model.model.load_weights("../checkpoints/cp.ckpt")
+model.model.load_weights('../checkpoints/cp.ckpt')
+
+# # Init base model and compile
+# model = TransferModel(base=BASE,
+#                       shape=INPUT_SHAPE,
+#                       classes=classes, dropout=0.2)
+#
+# model.compile(loss="categorical_crossentropy",
+#               optimizer=Adam(0.0001),
+#               metrics=["categorical_accuracy"])
+#
+# # Load weights
+# model.model.load_weights("../checkpoints/cp.ckpt")
 
 print("Weights loaded...")
 
 # model.evaluate(ds_valid)
 
-show_batch_top_n(model, ds_valid.take(1), classes, rescale=True, size=plot_size)
-
+# show_batch_top_n(model, ds_valid, classes, rescale=True, size=plot_size)
+show_batch_with_pred(model, ds_valid, classes, rescale=True, size=plot_size)
 
 # # Train model using defined tf.data.Datasets
 # model.train(ds_train=ds_train, ds_valid=ds_valid, epochs=10)

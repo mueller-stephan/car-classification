@@ -114,6 +114,49 @@ def show_batch(ds, classes, rescale=True, size=(10, 10), title=None):
     plt.show()
 
 
+def show_batch_with_pred(model, ds, classes, rescale=True, size=(10, 10), title=None):
+    """
+    Function to show a batch of images including labels from tf.data object
+
+    Args:
+        ds: a (batched) tf.data.Dataset
+        classes: a list of all classes (in order of one-hot-encoding)
+        rescale: boolen whether to multiple image values by 255
+        size: tuple giving plot size
+        title: plot title
+
+    Returns:
+        matplotlib.pyplot
+    """
+
+    ds1 = ds.take(1)
+
+    pred = model.predict(ds1, proba=False)
+
+    plt.figure(figsize=size)
+
+    for image, label in ds.take(1):
+        image_array = image.numpy()
+        label_array = label.numpy()
+        batch_size = image_array.shape[0]
+        for idx in range(batch_size):
+            label = classes[np.argmax(label_array[idx])]
+            ax = plt.subplot(np.ceil(batch_size / 4), 4, idx + 1)
+            if rescale:
+                plt.imshow(image_array[idx] * 255)
+            else:
+                plt.imshow(image_array[idx])
+            plt.title(label + ' ' + str(image_array[idx].shape) + "\n"
+                      + "prediction: " + classes[pred[idx]], fontsize=10)
+            plt.axis('off')
+
+    if title is not None:
+        plt.suptitle(title)
+
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.show()
+
+
 def show_batch_top_n(model, ds, classes, rescale=True, size=(10, 10), title=None, n=1):
     """
     Function to show a batch of images including labels from tf.data object
@@ -122,7 +165,7 @@ def show_batch_top_n(model, ds, classes, rescale=True, size=(10, 10), title=None
         model: Model used for predictions
         ds: a (batched) tf.data.Dataset
         classes: a list of all classes (in order of one-hot-encoding)
-        rescale: boolen whether to multiple image values by 255
+        rescale: boolean whether to multiple image values by 255
         size: tuple giving plot size
         title: plot title
         n: number of predicted values to plot per image
@@ -149,9 +192,9 @@ def show_batch_top_n(model, ds, classes, rescale=True, size=(10, 10), title=None
             else:
                 plt.imshow(image_array[idx])
             top = pred[idx][0][0]
-            plt.title(label + ' ' + str(image_array[idx].shape)
-                      + "\n" + "prediction: %s, prob: %.5f" % (classes[top], pred[idx][0][1]),
-                      fontsize=10)
+            title = label + ' ' + str(image_array[idx].shape) + "\n" + "prediction: %s, prob: %.5f" % (
+                    classes[top], pred[idx][0][1])
+            plt.title(title, fontsize=10)
             plt.axis('off')
 
     if title is not None:
