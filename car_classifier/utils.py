@@ -135,7 +135,7 @@ def show_batch_with_pred(model, ds, classes, rescale=True, size=(10, 10), title=
 
     plt.figure(figsize=size)
 
-    for image, label in ds.take(1):
+    for image, label in ds1:
         image_array = image.numpy()
         label_array = label.numpy()
         batch_size = image_array.shape[0]
