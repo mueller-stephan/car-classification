@@ -48,7 +48,7 @@ def get_image(filename, size=(212, 320)):
     image = tf.io.read_file(filename)
     image = tf.image.decode_jpeg(image)
     # print('Decoded image: \n' + 'minimum is: ' + str(tf.reduce_min(image)) + 'and maximum is: ' + str(tf.reduce_max(image)))
-    # image = tf.image.convert_image_dtype(image, tf.float32)
+    image = tf.image.convert_image_dtype(image, tf.float32)
     # print('Converted to float: \n' + 'minimum is: ' + str(tf.reduce_min(image)) + 'and maximum is: ' + str(tf.reduce_max(image)))
     image = tf.image.resize_with_crop_or_pad(image, target_height=size[0], target_width=size[1])
     # print('resized image: \n' + 'minimum is: ' + str(tf.reduce_min(image)) + 'and maximum is: ' + str(tf.reduce_max(image)))

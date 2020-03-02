@@ -44,22 +44,22 @@ ds_train = construct_ds(input_files=files_train, batch_size=BATCH_SIZE, classes=
 # ds_valid = construct_ds(input_files=files_valid, batch_size=BATCH_SIZE, classes=classes_lower, input_size=INPUT_SHAPE)
 # ds_test = construct_ds(input_files=files_test, batch_size=BATCH_SIZE, classes=classes_lower, input_size=INPUT_SHAPE)
 
-for image, label in ds_train.take(1):
-    plt.imshow(image[0])
-    plt.title(classes[np.argmax(label[0])])
-    plt.show()
-    break
+# for image, label in ds_train.take(1):
+#     plt.imshow(image[0])
+#     plt.title(classes[np.argmax(label[0])])
+#     plt.show()
+#     break
 
-# from tensorflow.keras.applications import ResNet50
-# from keras.applications.imagenet_utils import decode_predictions
-#
-# # Use Complete ResNet model
-# model = ResNet50(include_top=True, input_shape=INPUT_SHAPE, weights='imagenet')
-# # scale problem with input? Still doesn't make sense for evaluate...
-# pred = model.predict(ds_train.take(1))
-# pred_labels = decode_predictions(pred, top=3)
-#
-# print(pred_labels)
+from tensorflow.keras.applications import ResNet50V2
+from keras.applications.imagenet_utils import decode_predictions
+
+# Use Complete ResNet model
+model = ResNet50V2(include_top=True, input_shape=INPUT_SHAPE, weights='imagenet')
+# scale problem with input? Still doesn't make sense for evaluate...
+pred = model.predict(ds_train.take(1))
+pred_labels = decode_predictions(pred, top=3)
+
+print(pred_labels)
 
 # Show examples from one batch
 # plot_size = (18, 18)
