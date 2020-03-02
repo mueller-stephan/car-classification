@@ -1,5 +1,11 @@
 import tensorflow as tf
+import numpy as np
+# from keras.applications import imagenet_utils
+from keras.applications.resnet50 import preprocess_input
+from keras.preprocessing.image import image as prep_image
 
+
+FRACTION = 0.3
 
 def get_label(filename, label_type='make'):
     """
@@ -38,11 +44,17 @@ def get_image(filename, size=(212, 320)):
     Returns:
         Image as tf.Tensor
     """
+    # Prints only executed at initialization time -> no good for debugging
     image = tf.io.read_file(filename)
     image = tf.image.decode_jpeg(image)
+    # print('Decoded image: \n' + 'minimum is: ' + str(tf.reduce_min(image)) + 'and maximum is: ' + str(tf.reduce_max(image)))
     image = tf.image.convert_image_dtype(image, tf.float32)
+    # print('Converted to float: \n' + 'minimum is: ' + str(tf.reduce_min(image)) + 'and maximum is: ' + str(tf.reduce_max(image)))
     image = tf.image.resize_with_crop_or_pad(image, target_height=size[0], target_width=size[1])
-    image = image / 255.0
+    # print('resized image: \n' + 'minimum is: ' + str(tf.reduce_min(image)) + 'and maximum is: ' + str(tf.reduce_max(image)))
+    # image = preprocess_input(image)
+    image = image * 255.0
+    # print('Returned image: \n' + 'minimum is: ' + str(tf.reduce_min(image)) + 'and maximum is: ' + str(tf.reduce_max(image)))
     return image
 
 
@@ -100,9 +112,9 @@ def image_augment(image, label):
     # Flip image with probability .5
     image = tf.image.random_flip_left_right(image)
 
-    image = tf.image.random_brightness(image, max_delta=0.1 / 255.0)
-    image = tf.image.random_saturation(image, lower=0, upper=0.5)
-    # image = tf.image.random_contrast(image, lower=0, upper=1.2)
+    image = tf.image.random_brightness(image, max_delta=0.05 / 255.0)
+    image = tf.image.random_saturation(image, lower=0.9, upper=1.1)
+    image = tf.image.random_contrast(image, lower=0.9, upper=1.1)
 
     # Make sure the image is still in [0, 1]
     image = tf.clip_by_value(image, 0.0, 1.0)
@@ -142,7 +154,9 @@ def construct_ds(input_files,
     ds = ds.map(lambda x: parse_file(x, classes=classes, input_size=input_size))
 
     # Image augmentation
-    if augment:
+    random_nr = np.random.rand()
+
+    if augment and (random_nr < FRACTION):
         print("Doing augmentation...")
         ds = ds.map(image_augment)
 
