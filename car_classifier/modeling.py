@@ -66,8 +66,8 @@ class TransferModel:
 
         # Add final output layer
         add_to_base = Dense(len(self.classes), activation='softmax', name='head_pred')(add_to_base)
-        new_output = Dropout(dropout, name='head_pred_dropout')(add_to_base)
-        self.model = Model(self.base_model.input, new_output)
+        # new_output = Dropout(dropout, name='head_pred_dropout')(add_to_base)
+        self.model = Model(self.base_model.input, add_to_base)
 
         # Model overview
         layers = [(layer, layer.name, layer.trainable) for layer in self.model.layers]

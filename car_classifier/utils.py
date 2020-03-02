@@ -136,7 +136,7 @@ def show_batch_with_pred(model, ds, classes, rescale=True, size=(10, 10), title=
     plt.figure(figsize=size)
 
     for image, label in ds1:
-        image_array = image.numpy()
+        image_array = image.numpy().astype(int)
         label_array = label.numpy()
         batch_size = image_array.shape[0]
         for idx in range(batch_size):
@@ -157,6 +157,7 @@ def show_batch_with_pred(model, ds, classes, rescale=True, size=(10, 10), title=
     plt.show()
 
 
+# TODO: DEBUG
 def show_batch_top_n(model, ds, classes, rescale=True, size=(10, 10), title=None, n=1):
     """
     Function to show a batch of images including labels from tf.data object
@@ -191,9 +192,12 @@ def show_batch_top_n(model, ds, classes, rescale=True, size=(10, 10), title=None
                 plt.imshow(image_array[idx] * 255)
             else:
                 plt.imshow(image_array[idx])
-            top = pred[idx][0][0]
-            title = label + ' ' + str(image_array[idx].shape) + "\n" + "prediction: %s, prob: %.5f" % (
-                    classes[top], pred[idx][0][1])
+
+            title = label + ' ' + str(image_array[idx].shape)
+            for j in range(n):
+                top = pred[idx][j][0]
+                title = title + "\n" + "%s: %.5f" % (
+                        classes[top], pred[idx][j][1])
             plt.title(title, fontsize=10)
             plt.axis('off')
 
