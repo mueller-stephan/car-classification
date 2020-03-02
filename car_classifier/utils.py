@@ -143,7 +143,7 @@ def show_batch_with_pred(model, ds, classes, rescale=True, size=(10, 10), title=
             label = classes[np.argmax(label_array[idx])]
             ax = plt.subplot(np.ceil(batch_size / 4), 4, idx + 1)
             if rescale:
-                plt.imshow(image_array[idx] * 255)
+                plt.imshow(image_array[idx] / 255)
             else:
                 plt.imshow(image_array[idx])
             plt.title(label + ' ' + str(image_array[idx].shape) + "\n"
