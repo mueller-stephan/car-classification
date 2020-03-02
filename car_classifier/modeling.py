@@ -128,7 +128,7 @@ class TransferModel:
 
         checkpoint = ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True)
 
-        callbacks = [early_stopping, checkpoint]
+        callbacks = [checkpoint]
 
         # Fitting
         self.history = self.model.fit(ds_train,
